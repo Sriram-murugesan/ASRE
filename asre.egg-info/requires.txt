@@ -1,0 +1,17 @@
+langgraph>=0.2.0
+scikit-learn>=1.4.0
+groq>=0.9.0
+python-dotenv>=1.0.0
+
+[dashboard]
+streamlit>=1.35.0
+
+[db]
+supabase>=2.5.0
+
+[dev]
+pytest>=8.0.0
+
+[production-retrieval]
+faiss-cpu>=1.8.0
+sentence-transformers>=2.7.0

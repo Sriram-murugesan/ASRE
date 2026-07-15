@@ -1,0 +1,17 @@
+[
+  {"id": "doc_pricing_plans", "text": "Our pricing plans are Basic (free), Pro ($29/month), and Enterprise (custom pricing). Basic includes up to 3 projects. Pro includes unlimited projects and priority support. Enterprise adds SSO, dedicated account management, and custom SLAs."},
+  {"id": "doc_upgrade_plan", "text": "To upgrade your plan, go to Settings > Billing > Upgrade Plan. Changes take effect immediately and you'll be charged a prorated amount for the remainder of the billing cycle."},
+  {"id": "doc_downgrade_plan", "text": "To downgrade your plan, go to Settings > Billing > Change Plan. Downgrades take effect at the start of your next billing cycle, and you'll keep current features until then."},
+  {"id": "doc_sso_saml", "text": "SSO and SAML integration are available exclusively on the Enterprise plan. Contact your account manager to configure your identity provider (Okta, Azure AD, and Google Workspace are supported)."},
+  {"id": "doc_api_rate_limits", "text": "API rate limits are 100 requests/minute on Basic, 1000 requests/minute on Pro, and custom limits on Enterprise. Rate limit headers are included in every API response."},
+  {"id": "doc_data_export", "text": "You can export your data at any time from Settings > Data > Export. Exports are provided as a CSV or JSON archive and are available for download for 7 days."},
+  {"id": "doc_account_deletion", "text": "To permanently delete your account, go to Settings > Account > Delete Account. This action is irreversible and all data is purged within 30 days per our retention policy."},
+  {"id": "doc_two_factor_auth", "text": "Two-factor authentication (2FA) can be enabled in Settings > Security. We support authenticator apps (TOTP) and SMS-based codes."},
+  {"id": "doc_password_reset", "text": "To reset your password, click 'Forgot Password' on the login screen. A reset link is emailed to your registered address and expires after 1 hour."},
+  {"id": "doc_team_seats", "text": "Team seats can be added under Settings > Team > Invite Members. Pro plans include 5 seats; additional seats are $10/month each. Enterprise seat pricing is custom."},
+  {"id": "doc_integrations", "text": "We support integrations with Slack, Zapier, Google Sheets, and Salesforce. Integrations are configured under Settings > Integrations and require admin permissions."},
+  {"id": "doc_uptime_sla", "text": "Our platform maintains a 99.9% uptime SLA on Pro and Enterprise plans. Status updates are posted at status.example.com. Enterprise customers receive SLA credits for downtime beyond the guaranteed threshold."},
+  {"id": "doc_billing_cycle", "text": "Billing cycles run monthly or annually, selectable at signup or in Settings > Billing. Annual billing includes a 15% discount compared to monthly billing."},
+  {"id": "doc_refund_policy", "text": "Refunds are available within 14 days of a charge for annual plans and within 7 days for monthly plans. Refunds are processed to the original payment method within 5-10 business days."},
+  {"id": "doc_mobile_app", "text": "Our mobile app is available for iOS and Android and supports core features including notifications, task viewing, and commenting. Full admin controls require the web app."}
+]
