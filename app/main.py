@@ -91,6 +91,57 @@ class ChatResponse(BaseModel):
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# Helper: convert raw tool results into friendly, human-readable messages
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _format_action_reply(tool_name: str, result: dict) -> str:
+    """Return a natural-language reply for any supported tool result."""
+    status = result.get("status", "unknown")
+
+    if tool_name == "issue_refund":
+        if status == "success":
+            amount = result.get("amount")
+            amount_str = f"${amount:.2f}" if isinstance(amount, (int, float)) else str(amount)
+            return (
+                f"✅ Your refund of **{amount_str}** has been successfully processed! "
+                f"The amount will be returned to your original payment method within 3-5 business days."
+            )
+        else:
+            reason = result.get("reason", "unknown_error")
+            if reason == "no_amount_specified":
+                return (
+                    "⚠️ I wasn't able to process your refund because no refund amount was specified. "
+                    "Could you please provide the exact amount you'd like refunded (e.g. **$45.99**)?"
+                )
+            return f"❌ Refund failed: {reason}. Please contact support for further assistance."
+
+    if tool_name == "create_ticket":
+        if status == "success":
+            ticket_id = result.get("ticket_id", "N/A")
+            return (
+                f"🎫 A support ticket has been created for you! "
+                f"Your ticket ID is **{ticket_id}**. "
+                f"Our support team will review your issue and get back to you shortly."
+            )
+        return "❌ We couldn't create a support ticket at this time. Please try again later."
+
+    if tool_name == "book_callback":
+        if status == "success":
+            callback_id = result.get("callback_id", "N/A")
+            return (
+                f"📞 Your callback has been booked! "
+                f"Your callback reference is **{callback_id}**. "
+                f"One of our agents will reach out to you at the requested time."
+            )
+        return "❌ We couldn't schedule your callback at this time. Please try again later."
+
+    # Generic fallback for any unrecognised tool
+    if status == "success":
+        return f"✅ Done! {json.dumps(result)}"
+    return f"⚠️ Action result: {json.dumps(result)}"
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # Chat endpoint
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -111,7 +162,8 @@ def chat(req: ChatRequest):
         reply = result.get("answer", "I couldn't find an answer.")
     elif route == "action":
         tool_result = result.get("tool_result") or {}
-        reply = tool_result.get("message", json.dumps(tool_result))
+        tool_name   = result.get("tool_called", "")
+        reply = _format_action_reply(tool_name, tool_result)
     elif route == "escalation":
         reply = "Your case has been escalated to a human agent. We'll be in touch shortly."
     else:
@@ -162,7 +214,7 @@ def _build_execution(run_id: str, query: str, result: Dict[str, Any]) -> Dict[st
         if match:
             retrieval_chunks.append({
                 "id": doc_id,
-                "content": match.get("content", ""),
+                "content": match.get("text", ""),   # corpus field is "text", not "content"
                 "score": match.get("score", None),
             })
 

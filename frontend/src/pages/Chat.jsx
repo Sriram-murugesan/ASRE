@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import ChatBubble from '../components/chat/ChatBubble';
 import ChatInput from '../components/chat/ChatInput';
 import ExecutionPanel from '../components/chat/ExecutionPanel';
-import { Bot } from 'lucide-react';
+import { Bot, AlertCircle } from 'lucide-react';
+import { sendMessage } from '../services/chatService';
 
 export default function Chat() {
   const [messages, setMessages] = useState([
@@ -10,39 +11,51 @@ export default function Chat() {
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [executionData, setExecutionData] = useState(null);
+  const [error, setError] = useState(null);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const handleSend = (text) => {
+  const handleSend = async (text) => {
     // Add user message
     const newUserMsg = { id: Date.now(), text, isUser: true, timestamp: Date.now() };
     setMessages(prev => [...prev, newUserMsg]);
-    
-    // Simulate thinking
     setIsTyping(true);
     setExecutionData(null);
-    
-    setTimeout(() => {
-      setIsTyping(false);
-      setExecutionData({
-        latency: 1320,
-        confidence: 0.985,
-        steps: []
-      });
-      setMessages(prev => [...prev, { 
-        id: Date.now(), 
-        text: "I can certainly help you with that. I've analyzed your request and retrieved the relevant policy. Your refund of $45.99 for order ORD-123 has been processed.", 
-        isUser: false, 
-        timestamp: Date.now() 
+    setError(null);
+
+    try {
+      // ── Real API call to the ASRE backend ──────────────────────────────
+      const data = await sendMessage(text);
+      // data shape: { run_id, reply, route, execution }
+
+      setMessages(prev => [...prev, {
+        id: Date.now(),
+        text: data.reply,
+        isUser: false,
+        timestamp: Date.now(),
       }]);
-    }, 1500);
+
+      // Pass real execution data to the panel
+      setExecutionData(data.execution ?? null);
+    } catch (err) {
+      const errMsg = err?.message || 'Unknown error';
+      setError(errMsg);
+      setMessages(prev => [...prev, {
+        id: Date.now(),
+        text: `⚠️ Could not reach the ASRE backend: ${errMsg}. Please make sure the backend is running on port 8000.`,
+        isUser: false,
+        timestamp: Date.now(),
+      }]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   return (
@@ -60,17 +73,24 @@ export default function Chat() {
             </p>
           </div>
         </div>
-        
+
+        {error && (
+          <div className="mx-4 mt-3 p-3 bg-danger/10 border border-danger/30 rounded-lg flex items-center gap-2 text-xs text-danger">
+            <AlertCircle size={14} />
+            <span>Backend error: {error}</span>
+          </div>
+        )}
+
         <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 custom-scrollbar">
           {messages.map((msg) => (
-            <ChatBubble 
-              key={msg.id} 
-              message={msg.text} 
-              isUser={msg.isUser} 
-              timestamp={msg.timestamp} 
+            <ChatBubble
+              key={msg.id}
+              message={msg.text}
+              isUser={msg.isUser}
+              timestamp={msg.timestamp}
             />
           ))}
-          
+
           {isTyping && (
             <div className="flex gap-3 max-w-[85%]">
               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-card border border-border flex items-center justify-center text-primary">

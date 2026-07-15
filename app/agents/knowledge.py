@@ -35,6 +35,15 @@ def knowledge_node(state: dict, corpus: list, retriever) -> dict:
     query = state["query"]
     top_k_ids = retriever.retrieve(query, k=5)
 
+    # Guard: if retriever found nothing relevant, say so honestly
+    # rather than sending an empty context to the LLM and risking hallucination.
+    if not top_k_ids:
+        return {
+            **state,
+            "retrieved_doc_ids": [],
+            "answer": "I'm sorry, I couldn't find any relevant information in our knowledge base for your question. Please contact our support team for help.",
+        }
+
     retrieved_texts = [d["text"] for d in corpus if d["id"] in top_k_ids]
     context = "\n---\n".join(retrieved_texts)
 
